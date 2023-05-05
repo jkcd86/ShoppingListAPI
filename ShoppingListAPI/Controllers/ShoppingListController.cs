@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ShoppingListAPI.Models;
+using System.Security.Cryptography.Xml;
+using System.Xml.Linq;
 
 namespace ShoppingListAPI.Controllers
 {
@@ -8,6 +10,19 @@ namespace ShoppingListAPI.Controllers
     public class ShoppingListController: ControllerBase
     {
         private List<Article> shoppingArticles = new List<Article>();
+
+
+        /// <summary>
+        /// ctor
+        /// </summary>
+        public ShoppingListController()
+        {
+            Article articleOne = new Article { ID = 1, Name = "Milch", Amount = "2 Liter", Remark = "3,5% Fett", IsBought = false };
+            Article articleTwo = new Article { ID = 1, Name = "Cola", Amount = "2 Kisten", Remark = "", IsBought = false };
+            Article articleThree = new Article { ID = 1, Name = "Fanta", Amount = "1 Kiste", Remark = "gesünder als Cola... vielleicht? :-)", IsBought = false };
+            Article articleFour = new Article { ID = 4, Name = "Bananen", Amount = "6 Stück", Remark = "", IsBought = false };
+            shoppingArticles.Add(articleFour);
+        }
 
         #region // https://.../shoppinglist/api
         /// <summary>
@@ -124,6 +139,11 @@ namespace ShoppingListAPI.Controllers
         #endregion
 
         #region // https://.../shoppinglist/api/getarticles
+
+        /// <summary>
+        /// Get a list of all articles.
+        /// </summary>
+        /// <returns>Return resultcode and a list of type 'Article'</returns>
         [ProducesResponseType(typeof(string), 200)]
         [HttpGet("getarticles", Name = "GetArticles")]
         public IActionResult GetArticles()
@@ -132,5 +152,41 @@ namespace ShoppingListAPI.Controllers
         }
         #endregion
 
+        #region // https://.../shoppinglist/api/getarticles/{name}
+
+        /// <summary>
+        /// Get a specific article by name
+        /// </summary>
+        /// <param name="name">Specifies the name of the required article</param>
+        /// <returns>Return resultcode and an item of type 'Article'</returns>
+        [ProducesResponseType(typeof(string), 200)]
+        [ProducesResponseType(typeof(string), 400)]
+        [ProducesResponseType(typeof(string), 404)]
+
+        [HttpGet("getarticles/{name}", Name = "GetArticle")]
+        public IActionResult GetArticle(string name)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(name))
+                {
+                    return BadRequest(ModelState);
+                }
+                // Search for specific item in collection/database
+                var articleResult = shoppingArticles.Find(x => x.Name == name);
+
+                if (articleResult == null)
+                {
+                    return NotFound(name);
+                }
+                return Ok(articleResult);
+            }
+            catch (Exception exception)
+            {
+                return StatusCode(500, "Internal error oocured:" + exception.Message + " InnerException:" + exception.InnerException);
+            }
+            
+        }
+        #endregion
     }
 }
