@@ -123,5 +123,14 @@ namespace ShoppingListAPI.Controllers
 
         #endregion
 
+        #region // https://.../shoppinglist/api/getarticles
+        [ProducesResponseType(typeof(string), 200)]
+        [HttpGet("getarticles", Name = "GetArticles")]
+        public IActionResult GetArticles()
+        {
+            return Ok(shoppingArticles);
+        }
+        #endregion
+
     }
 }
