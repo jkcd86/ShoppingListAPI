@@ -63,5 +63,65 @@ namespace ShoppingListAPI.Controllers
         }
 
         #endregion
+
+        #region // https://...//shoppinglist/api/additem/{name}/{amount}/{remark}
+
+        /// <summary>
+        /// Method to add a new articleby url parameters
+        /// </summary>
+        /// <param name="name">Specifies the name of an article/param>
+        /// <param name="amount">Specifies the amount of an article</param>
+        /// <param name="remark">Specifies the remark of an article</param>
+        /// <returns>ResultCode</returns>
+        [ProducesResponseType(typeof(string), 200)]
+        [ProducesResponseType(typeof(string), 201)]
+        [ProducesResponseType(typeof(string), 400)]
+        [ProducesResponseType(typeof(string), 409)]
+        [ProducesResponseType(typeof(string), 500)]
+        [HttpPost("additem,/{name}/{amount}/{remark}", Name = "PostAddItemUrl")]
+        public IActionResult PostAddItemUrl(string name, string amount, string remark)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(name))
+                {
+                    return BadRequest(ModelState); // equals statuscode 400
+                }
+
+                if (shoppingArticles.Exists(x => x.Name == name))
+                {
+                    ModelState.AddModelError("", "The specified article still exists!"); // equals statuscode 400
+                }
+
+                if (string.IsNullOrEmpty(amount))
+                {
+                    amount = "-";
+                }
+
+                if (string.IsNullOrEmpty(remark))
+                {
+                    remark = "-";
+                }
+
+                // create article object
+                Article myArticle = new Article();
+                myArticle.Name = name;
+                myArticle.Amount = amount;
+                myArticle.Remark = remark;
+                myArticle.IsBought = false;
+                myArticle.ID = shoppingArticles.Count + 1;
+
+                shoppingArticles.Add(myArticle);
+
+                return StatusCode(201, myArticle); // 201 equals 'Created'
+            }
+            catch (Exception exception)
+            {
+                return StatusCode(500, "Internal error occured:" + exception.Message + " InnerException:" + exception.InnerException);
+            }
+        }
+
+        #endregion
+
     }
 }
