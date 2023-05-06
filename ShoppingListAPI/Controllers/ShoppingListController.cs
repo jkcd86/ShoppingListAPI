@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ShoppingListAPI.Models;
+using System;
 using System.Reflection.Metadata.Ecma335;
 
 namespace ShoppingListAPI.Controllers
@@ -224,6 +225,67 @@ namespace ShoppingListAPI.Controllers
                 // articleToBeUpdated.ID // DTO
                 // articleToBeUpdated.Name
                 return Ok(articleToBeUpdated);
+            }
+            catch (Exception exception)
+            {
+                return StatusCode(500, "Internal error occured:" + exception.Message + " InnerException:" + exception.InnerException);
+            }
+        }
+
+        #endregion
+
+        #region // https://.../shoppinglist/api/deletearticles
+
+        /// <summary>
+        /// Delete all articles.
+        /// </summary>
+        /// <returns>Return resultcode</returns>
+        [ProducesResponseType(typeof(string), 204)]
+        [HttpDelete("deletearticles", Name = "DeleteArticles")]
+        public IActionResult DeleteArticles()
+        {
+            try
+            {
+                shoppingArticles.Clear();
+                return NoContent();
+            }
+            catch (Exception exception)
+            {
+                return StatusCode(500, "Internal error occured:" + exception.Message + " InnerException:" + exception.InnerException);
+            }
+            
+        }
+
+        #endregion
+
+        #region // https://.../shoppinglist/api/deletearticle/{name}
+
+        /// <summary>
+        /// Delete a specific article by name.
+        /// </summary>
+        /// <param name="name">Specifies the name of the required article.</param>
+        /// <returns>Return resultcode</returns>
+        [ProducesResponseType(typeof(string), 204)]
+        [ProducesResponseType(typeof(string), 400)]
+        [ProducesResponseType(typeof(string), 404)]
+        [HttpDelete("deletearticles/{name}", Name = "DeleteArticle")]
+        public IActionResult DeleteArticle(string name)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(name))
+                {
+                    return BadRequest(ModelState);
+                }
+                // Search for specific item in collection/database
+                var articleResult = shoppingArticles.Find(x => x.Name == name);
+                if (articleResult == null)
+                {
+                    return NotFound(name);
+                }
+                shoppingArticles.Remove(articleResult);
+
+                return NoContent();
             }
             catch (Exception exception)
             {
