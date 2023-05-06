@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ShoppingListAPI.Models;
+using System.Reflection.Metadata.Ecma335;
 
 namespace ShoppingListAPI.Controllers
 {
@@ -175,6 +176,54 @@ namespace ShoppingListAPI.Controllers
                     return NotFound(name);
                 }
                 return Ok(articleResult);
+            }
+            catch (Exception exception)
+            {
+                return StatusCode(500, "Internal error occured:" + exception.Message + " InnerException:" + exception.InnerException);
+            }
+        }
+
+        #endregion
+
+        #region // https://.../shoppinglist/api/updatearticles/{name}
+
+        /// <summary>
+        /// Method to update an article.
+        /// </summary>
+        /// <param name="name">Specifies the name of the article to be updated </param>
+        /// <param name="article">Specifies an object of type 'Article'.</param>
+        /// <returns>Resultcode.</returns>
+        [ProducesResponseType(typeof(string), 200)]
+        [ProducesResponseType(typeof(string), 400)]
+        [ProducesResponseType(typeof(string), 404)]
+        [ProducesResponseType(typeof(string), 500)]
+        [HttpPut("updatearticles/{name}", Name = "PutUpdateItem")]
+        public IActionResult PutUpdateItem(string name, [FromBody] Article article)
+        {
+            try
+            {
+                if (article == null || String.IsNullOrEmpty(name))
+                {
+                    return BadRequest(ModelState); // Equals Statuscode 400
+                }
+
+                if (name != article.Name)
+                {
+                    return BadRequest("Submitted parameter 'name' differs from the submitted object 'article.Name' property!");
+                }
+
+                if (!shoppingArticles.Exists(x => x.Name == name))
+                {
+                    return NotFound("Article was not found: " + name);
+                }
+                // Update article
+                var articleToBeUpdated = shoppingArticles.Find(x => x.Name == name);
+                articleToBeUpdated.Amount = article.Amount;
+                articleToBeUpdated.IsBought = article.IsBought;
+                articleToBeUpdated.Remark = article.Remark;
+                // articleToBeUpdated.ID // DTO
+                // articleToBeUpdated.Name
+                return Ok(articleToBeUpdated);
             }
             catch (Exception exception)
             {
