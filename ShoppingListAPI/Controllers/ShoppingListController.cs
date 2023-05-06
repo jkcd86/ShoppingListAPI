@@ -5,7 +5,7 @@ using System.Reflection.Metadata.Ecma335;
 
 namespace ShoppingListAPI.Controllers
 {
-    [Route("[controller]/api/")] // https://.../shoppinglist/api
+    [Route("shoppinglist/v1/api/")] // https://.../shoppinglist/v1/api
     [ApiController]
     public class ShoppingListController : ControllerBase
     {
@@ -33,9 +33,10 @@ namespace ShoppingListAPI.Controllers
         /// </summary>
         /// <returns>Return an information.</returns>
         [HttpGet]
-        //[ProducesResponseType(typeof(string), 200)]
-        //[ProducesResponseType(typeof(string), 404)]
-        //[ProducesResponseType(typeof(string), 500)]
+        [ProducesResponseType(typeof(string), 200)]
+        [ProducesResponseType(typeof(string), 404)]
+        [ProducesResponseType(typeof(string), 500)]
+        [Obsolete("Method is deprecated, please use method xyz.")]
         public string Get()
         {
             return "*** ShoppingList REST API is running… ***";
@@ -284,7 +285,6 @@ namespace ShoppingListAPI.Controllers
                     return NotFound(name);
                 }
                 shoppingArticles.Remove(articleResult);
-
                 return NoContent();
             }
             catch (Exception exception)
