@@ -2,6 +2,8 @@
 using ShoppingListAPI.Models;
 using System;
 using System.Reflection.Metadata.Ecma335;
+using NLog;
+using NLog.Web;
 
 namespace ShoppingListAPI.Controllers
 {
@@ -9,7 +11,8 @@ namespace ShoppingListAPI.Controllers
     [ApiController]
     public class ShoppingListController : ControllerBase
     {
-        private List<Article> shoppingArticles = new List<Article>();
+        private static List<Article> shoppingArticles = new List<Article>();
+        Logger mylogger = LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
 
         /// <summary>
         /// ctor.
@@ -24,6 +27,7 @@ namespace ShoppingListAPI.Controllers
             shoppingArticles.Add(articleThree);
             Article articleFour = new Article { ID = 4, Name = "Bananen", Amount = "6 Stück", Remark = "", IsBought = false };
             shoppingArticles.Add(articleFour);
+            mylogger.Info("ShoppingListController initialized");
         }
 
         #region // https://.../shoppinglist/api
@@ -39,6 +43,7 @@ namespace ShoppingListAPI.Controllers
         [Obsolete("Method is deprecated, please use method xyz.")]
         public string Get()
         {
+            mylogger.Info("ShoppingListController 'Get' passed.");
             return "*** ShoppingList REST API is running… ***";
         }
 
